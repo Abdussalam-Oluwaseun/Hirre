@@ -25,7 +25,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import * as pdfjs from 'pdfjs-dist';
-import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, TabStopType, TabStopPosition } from 'docx';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -173,6 +173,13 @@ export default function ResumeTailorApp() {
         7. Add Values Alignment section if company lists values.
         8. ATS Formatting: Single column, clear headers (EXPERIENCE, EDUCATION, SKILLS), plain text contact info at top.
         9. NO headers/footers, NO images/logos, NO tables/columns, NO fancy templates, NO text boxes.
+        10. RESUME LAYOUT REQUIREMENTS:
+            - HEADER: Use # for Full Name (bold, centered). Use a line starting with "Contact:" for (email · phone · city · portfolio). Use a line starting with "Social:" for LinkedIn/GitHub.
+            - PROFESSIONAL SUMMARY: No section label, flows directly after header.
+            - SECTION HEADERS: Use ## for ALL CAPS headers.
+            - EXPERIENCE: Use ### for Role title | Date range. Bullet points with quantifiable achievements.
+            - SKILLS: Single paragraph / comma-separated list.
+            - EDUCATION: Use ### for Degree | Date range, institution on line below.
         
         ### TAILORING RULES (COVER LETTER):
         1. Paragraph 1: Hook with company-specific enthusiasm. Mention something specific about THIS company.
@@ -182,6 +189,12 @@ export default function ResumeTailorApp() {
         5. Paragraph 5: Confirm logistics (location, availability) and close.
         6. Keep under 400 words. Concise and impactful.
         7. Use human tone (contractions, conversational). Avoid "I am writing to express my interest...".
+        8. COVER LETTER LAYOUT REQUIREMENTS:
+            - HEADER: Use # for FULL NAME (bold, ALL CAPS, centered). Use a line starting with "Title:" for Job title. Use a line starting with "Contact1:" for email | phone. Use a line starting with "Contact2:" for address | portfolio.
+            - DATE LINE: Use a line starting with "Date:" (right-aligned).
+            - RECIPIENT BLOCK: Use a line starting with "Recipient:" for Company name (bold), then address lines.
+            - BODY: Justified text, 1.5 line height.
+            - CLOSING: "Sincerely," (left-aligned), Printed name (bold, right-aligned).
         
         ### OUTPUT FORMAT:
         Return a JSON object with two keys: "tailoredResume" and "coverLetter". 
@@ -248,21 +261,45 @@ export default function ResumeTailorApp() {
     try {
       const content = activeTab === 'resume' ? result.tailoredResume : result.coverLetter;
       const lines = content.split('\n');
+      
+      const isResume = activeTab === 'resume';
+      
       const paragraphs = lines.map(line => {
         const trimmed = line.trim();
         if (trimmed.startsWith('# ')) {
           return new Paragraph({
             text: trimmed.replace('# ', ''),
             heading: HeadingLevel.HEADING_1,
-            spacing: { before: 240, after: 120 },
+            alignment: AlignmentType.CENTER,
+            spacing: { before: isResume ? 240 : 480, after: 120 },
           });
         } else if (trimmed.startsWith('## ')) {
           return new Paragraph({
             text: trimmed.replace('## ', ''),
             heading: HeadingLevel.HEADING_2,
-            spacing: { before: 200, after: 100 },
+            border: {
+              bottom: { color: "auto", space: 1, style: "single", size: 6 },
+            },
+            spacing: { before: 280, after: 120 },
           });
         } else if (trimmed.startsWith('### ')) {
+          // Check if it's an experience entry with date
+          const parts = trimmed.replace('### ', '').split('|');
+          if (parts.length > 1) {
+            return new Paragraph({
+              children: [
+                new TextRun({ text: parts[0].trim(), bold: true, size: 21 }), // ~10.5pt
+                new TextRun({ text: '\t' + parts[1].trim(), size: 20 }), // ~10pt
+              ],
+              tabStops: [
+                {
+                  type: TabStopType.RIGHT,
+                  position: TabStopPosition.MAX,
+                },
+              ],
+              spacing: { before: 160, after: 80 },
+            });
+          }
           return new Paragraph({
             text: trimmed.replace('### ', ''),
             heading: HeadingLevel.HEADING_3,
@@ -272,11 +309,30 @@ export default function ResumeTailorApp() {
           return new Paragraph({
             text: trimmed.substring(2),
             bullet: { level: 0 },
-            spacing: { after: 100 },
+            spacing: { after: 80 },
+          });
+        } else if (trimmed.startsWith('Contact:') || trimmed.startsWith('Social:') || trimmed.startsWith('Contact1:') || trimmed.startsWith('Contact2:') || trimmed.startsWith('Title:')) {
+          return new Paragraph({
+            text: trimmed.split(':')[1].trim(),
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 60 },
+          });
+        } else if (trimmed.startsWith('Date:')) {
+          return new Paragraph({
+            text: trimmed.replace('Date:', '').trim(),
+            alignment: AlignmentType.RIGHT,
+            spacing: { after: 240 },
+          });
+        } else if (trimmed.startsWith('Recipient:')) {
+          return new Paragraph({
+            text: trimmed.replace('Recipient:', '').trim(),
+            bold: true,
+            spacing: { after: 120 },
           });
         } else if (trimmed) {
           return new Paragraph({
-            children: [new TextRun(trimmed)],
+            children: [new TextRun({ text: trimmed, size: 21 })], // ~10.5pt
+            alignment: AlignmentType.JUSTIFIED,
             spacing: { after: 120 },
           });
         }
@@ -285,7 +341,20 @@ export default function ResumeTailorApp() {
 
       const doc = new Document({
         sections: [{
-          properties: {},
+          properties: {
+            page: {
+              size: {
+                width: 11906, // A4 width in twips
+                height: 16838, // A4 height in twips
+              },
+              margin: {
+                top: isResume ? 1020 : 1134, // 18mm vs 20mm
+                bottom: isResume ? 1020 : 1134,
+                left: isResume ? 1134 : 1417, // 20mm vs 25mm
+                right: isResume ? 1134 : 1417,
+              },
+            },
+          },
           children: paragraphs,
         }],
       });
@@ -303,58 +372,71 @@ export default function ResumeTailorApp() {
     if (!contentRef.current) return;
     setIsDownloading(true);
     try {
-      const canvas = await html2canvas(contentRef.current, {
+      const element = contentRef.current;
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
+        windowWidth: 794, // A4 width at 96 DPI
         onclone: (clonedDoc) => {
-          // Inject a style block into the cloned document to override oklch colors
-          // which html2canvas cannot parse. This ensures the PDF export works
-          // even with Tailwind CSS v4's modern color functions.
           const style = clonedDoc.createElement('style');
           style.innerHTML = `
             * {
-              border-color: #e1e1da !important; /* border */
+              border-color: #e1e1da !important;
+            }
+            .resume-layout, .cover-letter-layout {
+              width: 210mm !important;
+              min-height: 297mm !important;
+              background-color: white !important;
+              color: black !important;
+              margin: 0 !important;
+              box-shadow: none !important;
+              border: none !important;
             }
             .prose {
-              color: #3d3826 !important; /* foreground */
-              background-color: #faf8f1 !important; /* background */
+              color: black !important;
+              background-color: white !important;
             }
-            h1, h2, h3, h4, h5, h6 {
-              color: #3d3826 !important; /* foreground */
-            }
-            p, li, span, div {
-              color: #3d3826 !important; /* foreground */
+            h1, h2, h3, h4, h5, h6, p, li, span, div, strong {
+              color: black !important;
             }
             a {
-              color: #cb6441 !important; /* primary */
+              color: black !important;
+              text-decoration: none !important;
             }
-            strong {
-              color: #3d3826 !important;
+            .text-muted-foreground {
+              color: #666 !important;
             }
-            code {
-              color: #cb6441 !important;
-              background-color: #f3f0e7 !important; /* muted */
-            }
-            pre {
-              background-color: #141414 !important; /* destructive/dark */
-              color: #f8fafc !important;
-            }
-            blockquote {
-              border-left-color: #e1e1da !important;
-              color: #525044 !important; /* secondary-foreground */
+            .border-border {
+              border-color: #000 !important;
             }
           `;
           clonedDoc.head.appendChild(style);
         }
       });
+      
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const imgHeight = (canvasHeight * pdfWidth) / canvasWidth;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+
       pdf.save(`${activeTab === 'resume' ? 'Tailored_Resume' : 'Cover_Letter'}.pdf`);
     } catch (err) {
       console.error('PDF Download Error:', err);
@@ -650,7 +732,9 @@ export default function ResumeTailorApp() {
             {/* Result Content */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
-                <div className="bg-card p-8 md:p-12 rounded-3xl shadow-sm border border-border min-h-[800px] prose prose-slate max-w-none overflow-hidden">
+                <div className={`bg-card p-8 md:p-12 rounded-3xl shadow-sm border border-border min-h-[800px] prose prose-slate max-w-none overflow-hidden ${
+                  activeTab === 'resume' ? 'resume-layout' : 'cover-letter-layout'
+                }`}>
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeTab}
@@ -659,9 +743,42 @@ export default function ResumeTailorApp() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="bg-card"
+                      className="bg-card w-full"
                     >
-                      <ReactMarkdown>
+                      <ReactMarkdown
+                        components={{
+                          h1: ({node, ...props}) => <h1 className={`text-center font-bold mb-2 ${activeTab === 'resume' ? 'text-2xl' : 'text-3xl uppercase'}`} {...props} />,
+                          h2: ({node, ...props}) => <h2 className="font-bold text-lg border-b border-border pb-1 mt-6 mb-3 uppercase tracking-wide" {...props} />,
+                          h3: ({node, ...props}) => {
+                            const content = String(props.children);
+                            if (content.includes('|')) {
+                              const [title, date] = content.split('|');
+                              return (
+                                <div className="flex justify-between items-baseline mt-4 mb-1">
+                                  <h3 className="font-bold text-base">{title.trim()}</h3>
+                                  <span className="text-sm font-medium text-muted-foreground">{date.trim()}</span>
+                                </div>
+                              );
+                            }
+                            return <h3 className="font-bold text-base mt-4 mb-1" {...props} />;
+                          },
+                          p: ({node, ...props}) => {
+                            const content = String(props.children);
+                            if (content.startsWith('Contact:') || content.startsWith('Social:') || content.startsWith('Contact1:') || content.startsWith('Contact2:') || content.startsWith('Title:')) {
+                              return <p className="text-center text-sm text-muted-foreground mb-1 mt-0" {...props} />;
+                            }
+                            if (content.startsWith('Date:')) {
+                              return <p className="text-right text-sm mb-4" {...props}>{content.replace('Date:', '').trim()}</p>;
+                            }
+                            if (content.startsWith('Recipient:')) {
+                              return <p className="text-left font-bold text-sm mb-1" {...props}>{content.replace('Recipient:', '').trim()}</p>;
+                            }
+                            return <p className="text-sm leading-relaxed text-justify mb-3" {...props} />;
+                          },
+                          li: ({node, ...props}) => <li className="text-sm leading-relaxed mb-1 ml-4 list-disc" {...props} />,
+                          ul: ({node, ...props}) => <ul className="mb-4" {...props} />,
+                        }}
+                      >
                         {activeTab === 'resume' ? result.tailoredResume : result.coverLetter}
                       </ReactMarkdown>
                     </motion.div>

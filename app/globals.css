@@ -24,6 +24,20 @@
   --color-input: rgb(180 177 163);
 }
 
+@utility resume-layout {
+  padding-top: 18mm !important;
+  padding-bottom: 18mm !important;
+  padding-left: 20mm !important;
+  padding-right: 20mm !important;
+}
+
+@utility cover-letter-layout {
+  padding-top: 20mm !important;
+  padding-bottom: 20mm !important;
+  padding-left: 25mm !important;
+  padding-right: 25mm !important;
+}
+
 @layer base {
   body {
     @apply bg-background text-foreground;
