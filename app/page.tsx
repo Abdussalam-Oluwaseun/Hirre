@@ -373,16 +373,27 @@ export default function ResumeTailorApp() {
     setIsDownloading(true);
     try {
       const element = contentRef.current;
+      
+      // Temporary style to ensure A4 dimensions during capture
+      const originalWidth = element.style.width;
+      const originalMinHeight = element.style.minHeight;
+      const originalBoxShadow = element.style.boxShadow;
+      
+      element.style.width = '210mm';
+      element.style.minHeight = '297mm';
+      element.style.boxShadow = 'none';
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        windowWidth: 794, // A4 width at 96 DPI
+        windowWidth: 794, // 210mm at 96 DPI
         onclone: (clonedDoc) => {
           const style = clonedDoc.createElement('style');
           style.innerHTML = `
             * {
-              border-color: #e1e1da !important;
+              border-color: #000 !important;
+              -webkit-print-color-adjust: exact;
             }
             .resume-layout, .cover-letter-layout {
               width: 210mm !important;
@@ -390,31 +401,38 @@ export default function ResumeTailorApp() {
               background-color: white !important;
               color: black !important;
               margin: 0 !important;
+              padding: 0 !important;
               box-shadow: none !important;
               border: none !important;
+            }
+            /* Re-apply layout paddings in cloned doc */
+            .resume-layout {
+              padding: 18mm 20mm !important;
+            }
+            .cover-letter-layout {
+              padding: 20mm 25mm !important;
             }
             .prose {
               color: black !important;
               background-color: white !important;
+              max-width: none !important;
             }
             h1, h2, h3, h4, h5, h6, p, li, span, div, strong {
               color: black !important;
             }
-            a {
-              color: black !important;
-              text-decoration: none !important;
-            }
-            .text-muted-foreground {
-              color: #666 !important;
-            }
-            .border-border {
-              border-color: #000 !important;
+            .text-muted-foreground, .text-gray-600 {
+              color: #4b5563 !important;
             }
           `;
           clonedDoc.head.appendChild(style);
         }
       });
       
+      // Restore original styles
+      element.style.width = originalWidth;
+      element.style.minHeight = originalMinHeight;
+      element.style.boxShadow = originalBoxShadow;
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -430,7 +448,7 @@ export default function ResumeTailorApp() {
       pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
       heightLeft -= pdfHeight;
 
-      while (heightLeft >= 0) {
+      while (heightLeft > 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
@@ -730,59 +748,70 @@ export default function ResumeTailorApp() {
             </div>
 
             {/* Result Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <div className={`bg-card p-8 md:p-12 rounded-3xl shadow-sm border border-border min-h-[800px] prose prose-slate max-w-none overflow-hidden ${
-                  activeTab === 'resume' ? 'resume-layout' : 'cover-letter-layout'
-                }`}>
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={activeTab}
-                      ref={contentRef}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="bg-card w-full"
-                    >
-                      <ReactMarkdown
-                        components={{
-                          h1: ({node, ...props}) => <h1 className={`text-center font-bold mb-2 ${activeTab === 'resume' ? 'text-2xl' : 'text-3xl uppercase'}`} {...props} />,
-                          h2: ({node, ...props}) => <h2 className="font-bold text-lg border-b border-border pb-1 mt-6 mb-3 uppercase tracking-wide" {...props} />,
-                          h3: ({node, ...props}) => {
-                            const content = String(props.children);
-                            if (content.includes('|')) {
-                              const [title, date] = content.split('|');
-                              return (
-                                <div className="flex justify-between items-baseline mt-4 mb-1">
-                                  <h3 className="font-bold text-base">{title.trim()}</h3>
-                                  <span className="text-sm font-medium text-muted-foreground">{date.trim()}</span>
-                                </div>
-                              );
-                            }
-                            return <h3 className="font-bold text-base mt-4 mb-1" {...props} />;
-                          },
-                          p: ({node, ...props}) => {
-                            const content = String(props.children);
-                            if (content.startsWith('Contact:') || content.startsWith('Social:') || content.startsWith('Contact1:') || content.startsWith('Contact2:') || content.startsWith('Title:')) {
-                              return <p className="text-center text-sm text-muted-foreground mb-1 mt-0" {...props} />;
-                            }
-                            if (content.startsWith('Date:')) {
-                              return <p className="text-right text-sm mb-4" {...props}>{content.replace('Date:', '').trim()}</p>;
-                            }
-                            if (content.startsWith('Recipient:')) {
-                              return <p className="text-left font-bold text-sm mb-1" {...props}>{content.replace('Recipient:', '').trim()}</p>;
-                            }
-                            return <p className="text-sm leading-relaxed text-justify mb-3" {...props} />;
-                          },
-                          li: ({node, ...props}) => <li className="text-sm leading-relaxed mb-1 ml-4 list-disc" {...props} />,
-                          ul: ({node, ...props}) => <ul className="mb-4" {...props} />,
-                        }}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <div className="lg:col-span-3">
+                <div className="bg-muted/30 p-4 md:p-8 rounded-3xl border border-border flex justify-center overflow-x-auto">
+                  <div 
+                    ref={contentRef}
+                    className={`bg-white shadow-2xl prose prose-slate max-w-none transition-all duration-300 ${
+                      activeTab === 'resume' ? 'resume-layout' : 'cover-letter-layout'
+                    }`}
+                    style={{ 
+                      width: '210mm', 
+                      minHeight: '297mm',
+                      backgroundColor: 'white',
+                      color: 'black'
+                    }}
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="w-full"
                       >
-                        {activeTab === 'resume' ? result.tailoredResume : result.coverLetter}
-                      </ReactMarkdown>
-                    </motion.div>
-                  </AnimatePresence>
+                        <ReactMarkdown
+                          components={{
+                            h1: ({node, ...props}) => <h1 className={`text-center font-bold mb-2 text-black ${activeTab === 'resume' ? 'text-2xl' : 'text-3xl uppercase'}`} {...props} />,
+                            h2: ({node, ...props}) => <h2 className="font-bold text-lg border-b border-black pb-1 mt-6 mb-3 uppercase tracking-wide text-black" {...props} />,
+                            h3: ({node, ...props}) => {
+                              const content = String(props.children);
+                              if (content.includes('|')) {
+                                const [title, date] = content.split('|');
+                                return (
+                                  <div className="flex justify-between items-baseline mt-4 mb-1">
+                                    <h3 className="font-bold text-base text-black">{title.trim()}</h3>
+                                    <span className="text-sm font-medium text-gray-600">{date.trim()}</span>
+                                  </div>
+                                );
+                              }
+                              return <h3 className="font-bold text-base mt-4 mb-1 text-black" {...props} />;
+                            },
+                            p: ({node, ...props}) => {
+                              const content = String(props.children);
+                              if (content.startsWith('Contact:') || content.startsWith('Social:') || content.startsWith('Contact1:') || content.startsWith('Contact2:') || content.startsWith('Title:')) {
+                                return <p className="text-center text-sm text-gray-600 mb-1 mt-0" {...props} />;
+                              }
+                              if (content.startsWith('Date:')) {
+                                return <p className="text-right text-sm mb-4 text-black" {...props}>{content.replace('Date:', '').trim()}</p>;
+                              }
+                              if (content.startsWith('Recipient:')) {
+                                return <p className="text-left font-bold text-sm mb-1 text-black" {...props}>{content.replace('Recipient:', '').trim()}</p>;
+                              }
+                              return <p className="text-sm leading-relaxed text-justify mb-3 text-black" {...props} />;
+                            },
+                            li: ({node, ...props}) => <li className="text-sm leading-relaxed mb-1 ml-4 list-disc text-black" {...props} />,
+                            ul: ({node, ...props}) => <ul className="mb-4" {...props} />,
+                            strong: ({node, ...props}) => <strong className="font-bold text-black" {...props} />,
+                          }}
+                        >
+                          {activeTab === 'resume' ? result.tailoredResume : result.coverLetter}
+                        </ReactMarkdown>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
 
