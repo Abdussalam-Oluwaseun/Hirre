@@ -27,17 +27,17 @@ const RULES_CHECKLIST = [
 
 export default function HowItWorks() {
   return (
-    <div className="min-h-screen bg-[var(--color-bg-100)] text-[var(--color-text-100)] font-sans">
+    <div className="min-h-screen bg-background text-foreground font-sans">
       {/* Header */}
-      <header className="bg-[var(--color-bg-200)] border-b border-[var(--color-bg-300)] sticky top-0 z-50">
+      <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="bg-[var(--color-primary-100)] p-2 rounded-lg">
+            <div className="bg-primary p-2 rounded-lg">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-100)]">ResumeTailor<span className="text-[var(--color-primary-100)]">AI</span></h1>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">Hirre</h1>
           </Link>
-          <Link href="/" className="text-sm font-bold text-[var(--color-primary-100)] hover:text-[var(--color-primary-200)] flex items-center gap-1">
+          <Link href="/" className="text-sm font-bold text-primary hover:opacity-80 flex items-center gap-1">
             <ArrowLeft className="w-4 h-4" />
             Back to App
           </Link>
@@ -46,69 +46,69 @@ export default function HowItWorks() {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-extrabold text-[var(--color-text-100)] mb-4 tracking-tight">How our AI Tailoring Works</h2>
-          <p className="text-lg text-[var(--color-text-200)]">
+          <h2 className="text-4xl font-extrabold text-foreground mb-4 tracking-tight">How our AI Tailoring Works</h2>
+          <p className="text-lg text-muted-foreground">
             We don&apos;t just rewrite your resume; we strategically re-engineer it to pass ATS filters and impress human recruiters.
           </p>
         </div>
 
         {/* Process Steps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-          <div className="bg-[var(--color-bg-200)] p-6 rounded-2xl shadow-sm border border-[var(--color-bg-300)]">
-            <div className="bg-[var(--color-primary-300)] w-12 h-12 rounded-xl flex items-center justify-center mb-4">
-              <Zap className="w-6 h-6 text-[var(--color-primary-100)]" />
+          <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+            <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+              <Zap className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-bold text-lg mb-2">1. Deep Analysis</h3>
-            <p className="text-sm text-[var(--color-text-200)] leading-relaxed">
+            <h3 className="font-bold text-lg mb-2 text-foreground">1. Deep Analysis</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Our AI performs a linguistic analysis of the job description to identify core competencies and hidden keywords.
             </p>
           </div>
-          <div className="bg-[var(--color-bg-200)] p-6 rounded-2xl shadow-sm border border-[var(--color-bg-300)]">
-            <div className="bg-[var(--color-primary-300)] w-12 h-12 rounded-xl flex items-center justify-center mb-4">
-              <Target className="w-6 h-6 text-[var(--color-primary-100)]" />
+          <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+            <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+              <Target className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-bold text-lg mb-2">2. Strategic Mapping</h3>
-            <p className="text-sm text-[var(--color-text-200)] leading-relaxed">
+            <h3 className="font-bold text-lg mb-2 text-foreground">2. Strategic Mapping</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               We map your existing experience to the JD, rephrasing your achievements to use the employer&apos;s preferred terminology.
             </p>
           </div>
-          <div className="bg-[var(--color-bg-200)] p-6 rounded-2xl shadow-sm border border-[var(--color-bg-300)]">
-            <div className="bg-[var(--color-primary-300)] w-12 h-12 rounded-xl flex items-center justify-center mb-4">
-              <ShieldCheck className="w-6 h-6 text-[var(--color-primary-100)]" />
+          <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+            <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+              <ShieldCheck className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-bold text-lg mb-2">3. ATS Validation</h3>
-            <p className="text-sm text-[var(--color-text-200)] leading-relaxed">
+            <h3 className="font-bold text-lg mb-2 text-foreground">3. ATS Validation</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               The final output is formatted to be 100% readable by all major ATS platforms (Workday, Greenhouse, Lever).
             </p>
           </div>
         </div>
 
         {/* Detailed Rules */}
-        <div className="bg-[var(--color-bg-200)] rounded-3xl shadow-sm border border-[var(--color-bg-300)] overflow-hidden">
-          <div className="bg-[var(--color-primary-100)] p-8 text-white">
+        <div className="bg-card rounded-3xl shadow-sm border border-border overflow-hidden">
+          <div className="bg-foreground p-8 text-background">
             <h3 className="text-2xl font-bold flex items-center gap-3">
-              <CheckCircle2 className="w-8 h-8 text-green-400" />
+              <CheckCircle2 className="w-8 h-8 text-primary" />
               The Tailoring Rules Checklist
             </h3>
-            <p className="text-[var(--color-primary-300)] mt-2">Every resume we generate follows these strict professional guidelines.</p>
+            <p className="text-muted-foreground mt-2">Every resume we generate follows these strict professional guidelines.</p>
           </div>
           <div className="p-8">
             <div className="space-y-8">
               {RULES_CHECKLIST.map((rule) => (
                 <div key={rule.id} className="flex items-start gap-4 group">
-                  <div className="mt-1 bg-[var(--color-bg-300)] p-2 rounded-lg group-hover:bg-[var(--color-primary-300)] transition-colors">
-                    <ChevronRight className="w-4 h-4 text-[var(--color-text-200)] group-hover:text-[var(--color-primary-100)]" />
+                  <div className="mt-1 bg-muted p-2 rounded-lg group-hover:bg-primary/10 transition-colors">
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
-                      <h4 className="font-bold text-[var(--color-text-100)]">{rule.label}</h4>
+                      <h4 className="font-bold text-foreground">{rule.label}</h4>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-                        rule.priority === 'HIGH' ? 'bg-red-50 text-red-600' : 'bg-[var(--color-accent-100)]/10 text-[var(--color-accent-200)]'
+                        rule.priority === 'HIGH' ? 'bg-primary/10 text-primary' : 'bg-secondary text-secondary-foreground'
                       }`}>
                         {rule.priority} PRIORITY
                       </span>
                     </div>
-                    <p className="text-sm text-[var(--color-text-200)] leading-relaxed">{rule.description}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{rule.description}</p>
                   </div>
                 </div>
               ))}
@@ -119,7 +119,7 @@ export default function HowItWorks() {
         <div className="mt-16 text-center">
           <Link 
             href="/"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--color-primary-100)] text-white rounded-2xl font-bold text-lg hover:bg-[var(--color-primary-200)] transition-all shadow-lg shadow-[var(--color-primary-300)]"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-lg shadow-primary/20"
           >
             <Sparkles className="w-6 h-6" />
             Start Tailoring Now
@@ -128,9 +128,9 @@ export default function HowItWorks() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[var(--color-bg-200)] border-t border-[var(--color-bg-300)] py-12 mt-20">
+      <footer className="bg-card border-t border-border py-12 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm text-[var(--color-text-200)]">© 2026 ResumeTailorAI. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© 2026 Hirre. All rights reserved.</p>
         </div>
       </footer>
     </div>

@@ -314,35 +314,35 @@ export default function ResumeTailorApp() {
           const style = clonedDoc.createElement('style');
           style.innerHTML = `
             * {
-              border-color: #c2baa6 !important; /* bg-300 */
+              border-color: #e1e1da !important; /* border */
             }
             .prose {
-              color: #353535 !important; /* text-100 */
-              background-color: #ebe2cd !important; /* bg-200 */
+              color: #3d3826 !important; /* foreground */
+              background-color: #faf8f1 !important; /* background */
             }
             h1, h2, h3, h4, h5, h6 {
-              color: #1e295a !important; /* primary-100 */
+              color: #3d3826 !important; /* foreground */
             }
             p, li, span, div {
-              color: #353535 !important; /* text-100 */
+              color: #3d3826 !important; /* foreground */
             }
             a {
-              color: #F18F01 !important; /* accent-100 */
+              color: #cb6441 !important; /* primary */
             }
             strong {
-              color: #1e295a !important;
+              color: #3d3826 !important;
             }
             code {
-              color: #833500 !important; /* accent-200 */
-              background-color: #F5ECD7 !important; /* bg-100 */
+              color: #cb6441 !important;
+              background-color: #f3f0e7 !important; /* muted */
             }
             pre {
-              background-color: #1e295a !important; /* primary-100 */
-              color: #F5ECD7 !important; /* bg-100 */
+              background-color: #141414 !important; /* destructive/dark */
+              color: #f8fafc !important;
             }
             blockquote {
-              border-left-color: #c2baa6 !important;
-              color: #5f5f5f !important; /* text-200 */
+              border-left-color: #e1e1da !important;
+              color: #525044 !important; /* secondary-foreground */
             }
           `;
           clonedDoc.head.appendChild(style);
@@ -364,24 +364,24 @@ export default function ResumeTailorApp() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-100)] text-[var(--color-text-100)] font-sans selection:bg-[var(--color-primary-300)] selection:text-[var(--color-primary-100)]">
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 selection:text-primary">
       {/* Header */}
-      <header className="bg-[var(--color-bg-200)] border-b border-[var(--color-bg-300)] sticky top-0 z-50">
+      <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-[var(--color-primary-100)] p-2 rounded-lg">
+            <div className="bg-primary p-2 rounded-lg">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-100)]">ResumeTailor<span className="text-[var(--color-primary-100)]">AI</span></h1>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">Hirre</h1>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/how-it-works" className="text-sm font-medium text-[var(--color-text-200)] hover:text-[var(--color-primary-100)] transition-colors flex items-center gap-1">
+            <Link href="/how-it-works" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
               How it works
               <ExternalLink className="w-3 h-3" />
             </Link>
             <button 
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 text-[var(--color-text-200)] hover:text-[var(--color-primary-100)] hover:bg-[var(--color-bg-300)] rounded-lg transition-all"
+              className="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-all"
               title="Settings"
             >
               <Settings className="w-5 h-5" />
@@ -400,36 +400,36 @@ export default function ResumeTailorApp() {
               exit={{ opacity: 0, height: 0 }}
               className="mb-8 overflow-hidden"
             >
-              <div className="bg-[var(--color-bg-200)] p-6 rounded-2xl shadow-sm border border-[var(--color-primary-300)]">
+              <div className="bg-card p-6 rounded-2xl shadow-sm border border-primary/10">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-lg flex items-center gap-2">
-                    <Key className="w-5 h-5 text-[var(--color-primary-100)]" />
+                  <h3 className="font-bold text-lg flex items-center gap-2 text-foreground">
+                    <Key className="w-5 h-5 text-primary" />
                     API Configuration
                   </h3>
-                  <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-[var(--color-bg-300)] rounded-lg">
-                    <X className="w-5 h-5 text-[var(--color-text-200)]" />
+                  <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-muted rounded-lg">
+                    <X className="w-5 h-5 text-muted-foreground" />
                   </button>
                 </div>
-                <p className="text-sm text-[var(--color-text-200)] mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   Provide your own Gemini API key to use the service. Your key is stored locally in your browser.
                 </p>
                 <div className="flex gap-2">
                   <input 
                     type="password"
                     placeholder="Enter your Gemini API Key..."
-                    className="flex-1 p-3 rounded-xl border border-[var(--color-bg-300)] focus:ring-2 focus:ring-[var(--color-primary-100)] focus:border-transparent outline-none text-sm bg-[var(--color-bg-100)]"
+                    className="flex-1 p-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm text-foreground"
                     value={userApiKey}
                     onChange={(e) => setUserApiKey(e.target.value)}
                   />
                   <button 
                     onClick={() => saveApiKey(userApiKey)}
-                    className="px-6 py-3 bg-[var(--color-primary-100)] text-white rounded-xl font-bold text-sm hover:bg-[var(--color-primary-200)] transition-all"
+                    className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:opacity-90 transition-all"
                   >
                     Save Key
                   </button>
                 </div>
-                <p className="text-[10px] text-[var(--color-text-200)] mt-2">
-                  Don&apos;t have a key? Get one for free at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary-100)] underline">Google AI Studio</a>.
+                <p className="text-[10px] text-muted-foreground mt-2">
+                  Don&apos;t have a key? Get one for free at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary underline">Google AI Studio</a>.
                 </p>
               </div>
             </motion.div>
@@ -440,16 +440,16 @@ export default function ResumeTailorApp() {
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-extrabold text-[var(--color-text-100)] mb-4 tracking-tight"
+            className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 tracking-tight"
           >
             Land your dream job with <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary-100)] to-[var(--color-primary-200)]">AI-powered precision.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">AI-powered precision.</span>
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-lg text-[var(--color-text-200)] max-w-2xl mx-auto"
+            className="text-lg text-muted-foreground max-w-2xl mx-auto"
           >
             Tailor your resume and cover letter to any job description in seconds. 
             Optimized for ATS systems and human recruiters.
@@ -464,28 +464,28 @@ export default function ResumeTailorApp() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              <div className="bg-[var(--color-bg-200)] p-6 rounded-2xl shadow-sm border border-[var(--color-bg-300)]">
+              <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
                 <div className="flex items-center gap-2 mb-4">
-                  <Briefcase className="w-5 h-5 text-[var(--color-primary-100)]" />
-                  <h3 className="font-bold text-lg">Job Description</h3>
+                  <Briefcase className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-lg text-foreground">Job Description</h3>
                 </div>
                 <textarea 
-                  className="w-full h-64 p-4 rounded-xl border border-[var(--color-bg-300)] focus:ring-2 focus:ring-[var(--color-primary-100)] focus:border-transparent outline-none transition-all resize-none text-sm bg-[var(--color-bg-100)]"
+                  className="w-full h-64 p-4 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none text-sm text-foreground"
                   placeholder="Paste the full job description here..."
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                 />
               </div>
 
-              <div className="bg-[var(--color-bg-200)] p-6 rounded-2xl shadow-sm border border-[var(--color-bg-300)]">
+              <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
                 <div className="flex items-center gap-2 mb-4">
-                  <FileText className="w-5 h-5 text-[var(--color-primary-100)]" />
-                  <h3 className="font-bold text-lg">Your Resume (PDF)</h3>
+                  <FileText className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-lg text-foreground">Your Resume (PDF)</h3>
                 </div>
                 
                 <div 
                   className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-4 ${
-                    resumeFile ? 'border-[var(--color-primary-300)] bg-[var(--color-primary-300)]/10' : 'border-[var(--color-bg-300)] hover:border-[var(--color-primary-100)] hover:bg-[var(--color-bg-300)]'
+                    resumeFile ? 'border-primary/20 bg-primary/5' : 'border-border hover:border-primary/40 hover:bg-muted'
                   }`}
                 >
                   <input 
@@ -498,39 +498,39 @@ export default function ResumeTailorApp() {
                   
                   {isParsing ? (
                     <div className="flex flex-col items-center gap-3">
-                      <Loader2 className="w-10 h-10 text-[var(--color-primary-100)] animate-spin" />
-                      <p className="text-sm font-medium text-[var(--color-text-200)]">Extracting text from PDF...</p>
+                      <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                      <p className="text-sm font-medium text-muted-foreground">Extracting text from PDF...</p>
                     </div>
                   ) : resumeFile ? (
                     <div className="flex flex-col items-center gap-4 w-full">
-                      <div className="bg-[var(--color-bg-100)] p-4 rounded-xl shadow-sm border border-[var(--color-primary-300)] flex items-center gap-3 w-full max-w-sm">
-                        <div className="bg-[var(--color-primary-300)] p-2 rounded-lg">
-                          <FileUp className="w-6 h-6 text-[var(--color-primary-100)]" />
+                      <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center gap-3 w-full max-w-sm">
+                        <div className="bg-primary/10 p-2 rounded-lg">
+                          <FileUp className="w-6 h-6 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-[var(--color-text-100)] truncate">{resumeFile.name}</p>
-                          <p className="text-xs text-[var(--color-text-200)]">{(resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                          <p className="text-sm font-bold text-foreground truncate">{resumeFile.name}</p>
+                          <p className="text-xs text-muted-foreground">{(resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             removeFile();
                           }}
-                          className="p-1 hover:bg-[var(--color-bg-300)] rounded-lg transition-colors"
+                          className="p-1 hover:bg-muted rounded-lg transition-colors"
                         >
-                          <X className="w-5 h-5 text-[var(--color-text-200)]" />
+                          <X className="w-5 h-5 text-muted-foreground" />
                         </button>
                       </div>
-                      <p className="text-xs text-[var(--color-text-200)]">Click or drag to replace file</p>
+                      <p className="text-xs text-muted-foreground">Click or drag to replace file</p>
                     </div>
                   ) : (
                     <>
-                      <div className="bg-[var(--color-bg-300)] p-4 rounded-full">
-                        <Upload className="w-8 h-8 text-[var(--color-text-200)]" />
+                      <div className="bg-muted p-4 rounded-full">
+                        <Upload className="w-8 h-8 text-muted-foreground" />
                       </div>
                       <div className="text-center">
-                        <p className="text-sm font-bold text-[var(--color-text-100)]">Click to upload or drag and drop</p>
-                        <p className="text-xs text-[var(--color-text-200)] mt-1">PDF files only (max 10MB)</p>
+                        <p className="text-sm font-bold text-foreground">Click to upload or drag and drop</p>
+                        <p className="text-xs text-muted-foreground mt-1">PDF files only (max 10MB)</p>
                       </div>
                     </>
                   )}
@@ -539,7 +539,7 @@ export default function ResumeTailorApp() {
 
               {error.message && (
                 <div className={`flex items-start gap-3 p-4 rounded-xl border ${
-                  error.type === 'api_key' ? 'bg-[var(--color-accent-100)]/10 border-[var(--color-accent-100)]/20 text-[var(--color-accent-200)]' : 
+                  error.type === 'api_key' ? 'bg-amber-50 border-amber-100 text-amber-800' : 
                   error.type === 'quota' ? 'bg-blue-50 border-blue-100 text-blue-800' :
                   'bg-red-50 border-red-100 text-red-800'
                 }`}>
@@ -567,7 +567,7 @@ export default function ResumeTailorApp() {
               <button 
                 onClick={handleTailor}
                 disabled={isLoading || isParsing || !resumeText}
-                className="w-full py-4 bg-[var(--color-primary-100)] text-white rounded-xl font-bold text-lg hover:bg-[var(--color-primary-200)] transition-all shadow-lg shadow-[var(--color-primary-300)] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
@@ -590,12 +590,12 @@ export default function ResumeTailorApp() {
             className="space-y-8"
           >
             {/* Results Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[var(--color-bg-200)] p-4 rounded-2xl shadow-sm border border-[var(--color-bg-300)]">
-              <div className="flex p-1 bg-[var(--color-bg-100)] rounded-xl w-full md:w-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-card p-4 rounded-2xl shadow-sm border border-border">
+              <div className="flex p-1 bg-muted rounded-xl w-full md:w-auto">
                 <button 
                   onClick={() => setActiveTab('resume')}
                   className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-                    activeTab === 'resume' ? 'bg-[var(--color-bg-200)] text-[var(--color-primary-100)] shadow-sm' : 'text-[var(--color-text-200)] hover:text-[var(--color-text-100)]'
+                    activeTab === 'resume' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <FileCheck className="w-4 h-4" />
@@ -604,7 +604,7 @@ export default function ResumeTailorApp() {
                 <button 
                   onClick={() => setActiveTab('coverLetter')}
                   className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-                    activeTab === 'coverLetter' ? 'bg-[var(--color-bg-200)] text-[var(--color-primary-100)] shadow-sm' : 'text-[var(--color-text-200)] hover:text-[var(--color-text-100)]'
+                    activeTab === 'coverLetter' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Mail className="w-4 h-4" />
@@ -617,7 +617,7 @@ export default function ResumeTailorApp() {
                   <button 
                     onClick={downloadAsDocx}
                     disabled={isDownloading}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-primary-100)] text-white text-sm font-bold hover:bg-[var(--color-primary-200)] transition-all disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition-all disabled:opacity-50"
                   >
                     {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
                     DOCX
@@ -625,7 +625,7 @@ export default function ResumeTailorApp() {
                   <button 
                     onClick={downloadAsPdf}
                     disabled={isDownloading}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-bg-300)] text-sm font-bold hover:bg-[var(--color-bg-300)] transition-all disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border text-sm font-bold hover:bg-muted transition-all disabled:opacity-50"
                   >
                     {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                     PDF
@@ -633,14 +633,14 @@ export default function ResumeTailorApp() {
                 </div>
                 <button 
                   onClick={() => copyToClipboard(activeTab === 'resume' ? result.tailoredResume : result.coverLetter)}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-bg-300)] text-sm font-bold hover:bg-[var(--color-bg-300)] transition-all"
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border text-sm font-bold hover:bg-muted transition-all"
                 >
                   <Copy className="w-4 h-4" />
                   Copy
                 </button>
                 <button 
                   onClick={() => setResult(null)}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-text-100)] text-white text-sm font-bold hover:bg-[var(--color-text-200)] transition-all"
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-foreground text-background text-sm font-bold hover:opacity-90 transition-all"
                 >
                   Reset
                 </button>
@@ -650,7 +650,7 @@ export default function ResumeTailorApp() {
             {/* Result Content */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
-                <div className="bg-[var(--color-bg-200)] p-8 md:p-12 rounded-3xl shadow-sm border border-[var(--color-bg-300)] min-h-[800px] prose prose-slate max-w-none overflow-hidden">
+                <div className="bg-card p-8 md:p-12 rounded-3xl shadow-sm border border-border min-h-[800px] prose prose-slate max-w-none overflow-hidden">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeTab}
@@ -659,7 +659,7 @@ export default function ResumeTailorApp() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="bg-[var(--color-bg-200)]"
+                      className="bg-card"
                     >
                       <ReactMarkdown>
                         {activeTab === 'resume' ? result.tailoredResume : result.coverLetter}
@@ -671,37 +671,37 @@ export default function ResumeTailorApp() {
 
               {/* Sidebar Checklist */}
               <div className="space-y-6">
-                <div className="bg-[var(--color-primary-100)] p-6 rounded-2xl text-white shadow-lg shadow-[var(--color-primary-300)]">
+                <div className="bg-primary p-6 rounded-2xl text-primary-foreground shadow-lg shadow-primary/10">
                   <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
                     <Sparkles className="w-5 h-5" />
                     AI Insights
                   </h4>
-                  <p className="text-[var(--color-primary-300)] text-sm leading-relaxed">
+                  <p className="text-primary-foreground/80 text-sm leading-relaxed">
                     We&apos;ve optimized your {activeTab} using the exact keywords from the job description. 
                     The structure has been mirrored to match the recruiter&apos;s expectations.
                   </p>
                 </div>
 
-                <div className="bg-[var(--color-bg-200)] p-6 rounded-2xl shadow-sm border border-[var(--color-bg-300)]">
-                  <h4 className="font-bold text-[var(--color-text-100)] mb-4">Applied Rules</h4>
+                <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+                  <h4 className="font-bold text-foreground mb-4">Applied Rules</h4>
                   <div className="space-y-3">
                     {RULES_CHECKLIST.filter(r => activeTab === 'resume' ? !r.id.startsWith('cl_') : r.id.startsWith('cl_') || r.id === 'keywords').map((rule) => (
                       <div key={rule.id} className="flex items-center gap-3">
                         <div className="bg-green-100 p-0.5 rounded-full">
                           <CheckCircle2 className="w-4 h-4 text-green-600" />
                         </div>
-                        <span className="text-xs font-medium text-[var(--color-text-200)]">{rule.label}</span>
+                        <span className="text-xs font-medium text-muted-foreground">{rule.label}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="bg-[var(--color-accent-100)]/10 p-6 rounded-2xl border border-[var(--color-accent-100)]/20">
-                  <h4 className="font-bold text-[var(--color-accent-200)] text-sm mb-2 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
+                <div className="bg-muted p-6 rounded-2xl border border-border">
+                  <h4 className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-primary" />
                     Next Steps
                   </h4>
-                  <ul className="text-xs text-[var(--color-accent-200)] space-y-2 list-disc pl-4">
+                  <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
                     <li>Proofread for any AI hallucinations or minor errors.</li>
                     <li>Ensure all contact information is correct.</li>
                     <li>Save as .docx for maximum ATS compatibility.</li>
@@ -715,19 +715,19 @@ export default function ResumeTailorApp() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[var(--color-bg-200)] border-t border-[var(--color-bg-300)] py-12 mt-20">
+      <footer className="bg-card border-t border-border py-12 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="bg-[var(--color-bg-300)] p-1.5 rounded-lg">
-              <Sparkles className="w-4 h-4 text-[var(--color-text-200)]" />
+            <div className="bg-muted p-1.5 rounded-lg">
+              <Sparkles className="w-4 h-4 text-primary" />
             </div>
-            <span className="text-lg font-bold tracking-tight text-[var(--color-text-100)]">ResumeTailorAI</span>
+            <span className="text-lg font-bold tracking-tight text-foreground">Hirre</span>
           </div>
-          <p className="text-sm text-[var(--color-text-200)] mb-8">Helping professionals land their next big role with AI.</p>
-          <div className="flex justify-center gap-8 text-sm font-medium text-[var(--color-text-200)]">
-            <a href="#" className="hover:text-[var(--color-primary-100)]">Privacy Policy</a>
-            <a href="#" className="hover:text-[var(--color-primary-100)]">Terms of Service</a>
-            <a href="#" className="hover:text-[var(--color-primary-100)]">Contact Us</a>
+          <p className="text-sm text-muted-foreground mb-8">Helping professionals land their next big role with AI.</p>
+          <div className="flex justify-center gap-8 text-sm font-medium text-muted-foreground">
+            <a href="#" className="hover:text-primary">Privacy Policy</a>
+            <a href="#" className="hover:text-primary">Terms of Service</a>
+            <a href="#" className="hover:text-primary">Contact Us</a>
           </div>
         </div>
       </footer>
