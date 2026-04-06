@@ -91,12 +91,74 @@ export default function ResumeTailorApp() {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        
+        // Sort items by Y (top to bottom) then X (left to right) to handle complex layouts
+        const items = textContent.items as any[];
+        items.sort((a, b) => {
+          // transform[5] is the Y coordinate (vertical position)
+          // transform[4] is the X coordinate (horizontal position)
+          const yDiff = b.transform[5] - a.transform[5];
+          if (Math.abs(yDiff) < 5) { // Same line (with a small threshold)
+            return a.transform[4] - b.transform[4];
+          }
+          return yDiff;
+        });
+
+        let lastY = -1;
+        let pageText = '';
+        items.forEach((item: any) => {
+          // If the vertical position changes significantly, add a newline
+          if (lastY !== -1 && Math.abs(item.transform[5] - lastY) > 5) {
+            pageText += '\n';
+          }
+          pageText += item.str + ' ';
+          lastY = item.transform[5];
+        });
+        
         fullText += pageText + '\n';
       }
       
       if (!fullText.trim()) {
-        throw new Error('No text could be extracted from this PDF. It might be an image-based PDF.');
+        // Fallback for scanned documents using Gemini Vision
+        try {
+          let ocrText = '';
+          const maxOcrPages = Math.min(pdf.numPages, 3); // Limit to first 3 pages to avoid long waits
+          
+          for (let i = 1; i <= maxOcrPages; i++) {
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 2.0 });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            if (context) {
+              canvas.height = viewport.height;
+              canvas.width = viewport.width;
+              await page.render({ canvasContext: context, viewport }).promise;
+              const base64Image = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+              
+              const ai = getAIClient();
+              if (ai) {
+                const response = await ai.models.generateContent({
+                  model: "gemini-3-flash-preview",
+                  contents: {
+                    parts: [
+                      { text: `Extract all text from page ${i} of this resume. Maintain the structure and content exactly. Return only the extracted text.` },
+                      { inlineData: { data: base64Image, mimeType: "image/jpeg" } }
+                    ]
+                  }
+                });
+                ocrText += (response.text || '') + '\n';
+              }
+            }
+          }
+          fullText = ocrText;
+        } catch (ocrErr) {
+          console.error('OCR Fallback Error:', ocrErr);
+        }
+      }
+      
+      if (!fullText.trim()) {
+        throw new Error('No text could be extracted from this PDF. It might be a scanned document or an image-based PDF. Please try copy-pasting your resume text directly.');
       }
       
       setResumeText(fullText);
@@ -319,14 +381,19 @@ export default function ResumeTailorApp() {
           });
         } else if (trimmed.startsWith('Date:')) {
           return new Paragraph({
-            text: trimmed.replace('Date:', '').trim(),
+            children: [new TextRun({ text: trimmed.replace('Date:', '').trim(), size: 20 })],
             alignment: AlignmentType.RIGHT,
             spacing: { after: 240 },
           });
         } else if (trimmed.startsWith('Recipient:')) {
           return new Paragraph({
-            text: trimmed.replace('Recipient:', '').trim(),
-            bold: true,
+            children: [
+              new TextRun({
+                text: trimmed.replace('Recipient:', '').trim(),
+                bold: true,
+                size: 20,
+              }),
+            ],
             spacing: { after: 120 },
           });
         } else if (trimmed) {
