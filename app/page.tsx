@@ -75,10 +75,13 @@ export default function ResumeTailorApp() {
   };
 
   const getAIClient = () => {
+    // Priority: 1. User-provided key (local storage), 2. Environment variable
     const key = userApiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
     if (!key) return null;
     return new GoogleGenAI({ apiKey: key });
   };
+
+  const isSystemKeyAvailable = !!process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
   const extractTextFromPDF = async (file: File) => {
     setIsParsing(true);
@@ -203,7 +206,7 @@ export default function ResumeTailorApp() {
     const ai = getAIClient();
     if (!ai) {
       setError({ 
-        message: 'Gemini API Key is missing. Please add your own API key in the settings.', 
+        message: 'No API key found. Please add your own Gemini API key in the settings to continue.', 
         type: 'api_key' 
       });
       setShowSettings(true);
@@ -578,12 +581,14 @@ export default function ResumeTailorApp() {
                   </button>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Provide your own Gemini API key to use the service. Your key is stored locally in your browser.
+                  {isSystemKeyAvailable 
+                    ? "A system default API key is active. You can provide your own key below to use your own quota or different models."
+                    : "Provide your own Gemini API key to use the service. Your key is stored locally in your browser."}
                 </p>
                 <div className="flex gap-2">
                   <input 
                     type="password"
-                    placeholder="Enter your Gemini API Key..."
+                    placeholder={isSystemKeyAvailable ? "Using system default (optional)..." : "Enter your Gemini API Key..."}
                     className="flex-1 p-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm text-foreground"
                     value={userApiKey}
                     onChange={(e) => setUserApiKey(e.target.value)}
